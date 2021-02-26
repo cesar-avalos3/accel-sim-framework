@@ -36,6 +36,8 @@ parser.add_option("-N", "--nsight_profiler", dest="nsight_profiler", action="sto
                  help="use the new nsight cli profiler")
 parser.add_option("-d", "--disable_nvprof", dest="disable_nvprof", action="store_true",
                  help="do not use nvprof (decrecated in Turing+)")
+parser.add_option("-S", "--nsys_profiler", dest="nsys_profiler", action="store_true",
+                 help="Use the Nsys profiler for counting cycles instead of Ncu")
 (options, args) = parser.parse_args()
 
 if not options.disable_nvprof:
@@ -111,7 +113,12 @@ for bench in benchmarks:
                 sh_contents += "\nexport CUDA_VERSION=\"" + cuda_version + "\"; export CUDA_VISIBLE_DEVICES=\"" + options.device_num +\
                     "\" ; timeout 5m nvprof --concurrent-kernels off --print-gpu-trace --events elapsed_cycles_sm --demangling off --csv --log-file " +\
                     os.path.join(this_run_dir,logfile + ".elapsed_cycles_sm.{0}".format(i)) + " " + exec_path + " " + str(args) + " "
-            if options.nsight_profiler:
+            if options.nsys_profiler:
+                sh_contents += "\nexport CUDA_VERSION=\"" + cuda_version + "\"; export CUDA_VISIBLE_DEVICES=\"" + options.device_num +\
+                    "\" ; timeout 5m nsys profile -o "+os.path.join(this_run_dir,"out") + " " +\
+                        exec_path + " " + str(args) + "; nsys stats -f csv --report gputrace "+os.path.join(this_run_dir,"out.qdrep")+\
+                        " | tee cycles.csv; python "+os.path.join(this_directory,"postprocess-nsys-csv.py")+" --path "+this_run_dir
+            elif options.nsight_profiler:
                 sh_contents += "\nexport CUDA_VERSION=\"" + cuda_version + "\"; export CUDA_VISIBLE_DEVICES=\"" + options.device_num +\
                     "\" ; timeout 5m nv-nsight-cu-cli --metrics gpc__cycles_elapsed.avg --csv " +\
                         exec_path + " " + str(args) + " | tee " +\
