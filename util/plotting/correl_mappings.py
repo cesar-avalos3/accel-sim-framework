@@ -11,6 +11,7 @@ config_maps = \
     "TITANK" : set("GeForce GTX TITAN"),
     "QV100" : set(["TITAN V", "Quadro GV100","Tesla V100-SXM2-32GB"]),
     "RTX2060" : set("GeForce RTX 2060"),
+    "RTX3070" : set("GeForce RTX 3070"),
 }
 
 
@@ -103,13 +104,13 @@ correl_list = \
         plottype="log",
         stattype="counter"
     ),
-    CorrelStat(chart_name="RTX 2060 SM Cycles",
-        plotfile="rtx2060_sm_cycles",
+    CorrelStat(chart_name="GPC Cycles",
+        plotfile="gpc_cycles",
         hw_eval="np.average(hw[\"gpc__cycles_elapsed.avg\"])",
         hw_error="np.max(hw[\"gpc__cycles_elapsed.avg\"]) - np.average(hw[\"gpc__cycles_elapsed.avg\"]),"+\
                  "np.average(hw[\"gpc__cycles_elapsed.avg\"]) - np.min(hw[\"gpc__cycles_elapsed.avg\"])",
         sim_eval="float(sim[\"gpu_tot_sim_cycle\s*=\s*(.*)\"])",
-        hw_name="GeForce RTX 2060",
+        hw_name="all",
         drophwnumbelow=0,
         plottype="log",
         stattype="counter"
