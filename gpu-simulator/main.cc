@@ -66,6 +66,8 @@ int main(int argc, const char **argv) {
 
   tconfig.parse_config();
 
+  unsigned dim = 0;
+  bool pka_enabled = true;
   // for each kernel
   // load file
   // parse and create kernel info
@@ -123,6 +125,7 @@ int main(int argc, const char **argv) {
       }
       if (!stream_busy && m_gpgpu_sim->can_start_kernel() &&
           !k->was_launched()) {
+        dim = k->get_trace_info()->grid_dim_x * k->get_trace_info()->grid_dim_y * k->get_trace_info()->grid_dim_z;
         std::cout << "launching kernel name: " << k->get_name()
                   << " uid: " << k->get_uid() << std::endl;
         m_gpgpu_sim->launch(k);
@@ -153,6 +156,18 @@ int main(int argc, const char **argv) {
 
       active = m_gpgpu_sim->active();
       finished_kernel_uid = m_gpgpu_sim->finished_kernel();
+      if(pka_enabled)
+      {
+        if((m_gpgpu_sim->gpu_sim_cycle % 5000) == 0)
+          std::cout << "CoV: " <<m_gpgpu_sim->get_cov() << "\n";
+        if(m_gpgpu_sim->pka_stable())
+        {
+          active = false;
+          m_gpgpu_sim->print_pka_stats(dim);
+          m_gpgpu_sim->stop_all_running_kernels();
+          finished_kernel_uid = m_gpgpu_sim->finished_kernel();
+        }
+      }
     } while (active && !finished_kernel_uid);
 
     // cleanup finished kernel
