@@ -67,7 +67,7 @@ int main(int argc, const char **argv) {
   tconfig.parse_config();
 
   unsigned dim = 0;
-  bool pka_enabled = false;
+  bool pka_enabled = true;
   // for each kernel
   // load file
   // parse and create kernel info
