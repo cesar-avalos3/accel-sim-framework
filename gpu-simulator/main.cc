@@ -67,7 +67,7 @@ int main(int argc, const char **argv) {
   tconfig.parse_config();
 
   unsigned dim = 0;
-  bool pka_enabled = true;
+  bool pka_enabled = false;
   // for each kernel
   // load file
   // parse and create kernel info
@@ -160,7 +160,7 @@ int main(int argc, const char **argv) {
       {
         if((m_gpgpu_sim->gpu_sim_cycle % 5000) == 0)
           std::cout << "CoV: " <<m_gpgpu_sim->get_cov() << "\n";
-        if(m_gpgpu_sim->pka_stable())
+        if(m_gpgpu_sim->pka_stable(dim))
         {
           active = false;
           m_gpgpu_sim->print_pka_stats(dim);
